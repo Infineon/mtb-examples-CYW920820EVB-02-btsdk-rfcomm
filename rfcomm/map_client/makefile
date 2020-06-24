@@ -30,46 +30,39 @@
 # of such system or application assumes all risk of such use and in doing
 # so agrees to indemnify Cypress against all liability.
 #
-
 ifeq ($(WHICHFILE),true)
 $(info Processing $(lastword $(MAKEFILE_LIST)))
 endif
-
 #
 # Basic Configuration
 #
-APPNAME=BT_SPP_MULTI_PORT
+APPNAME=BT_MapClient
 TOOLCHAIN=GCC_ARM
 CONFIG=Debug
 VERBOSE=
 
 # default target
 TARGET=CYW920820EVB-02
+
 SUPPORTED_TARGETS = \
-  CYW920819EVB-02 \
-  CYW920820EVB-02 \
+  CYW920721B2EVK-03 \
   CYW920721B2EVK-02 \
   CYW920719B2Q40EVB-01 \
-  CYW920706WCDEVAL \
-# App available on below platforms but not enabled
-#  CYBT-353027-EVAL \
-#  CYBT-343026-EVAL \
-#  CYBT-213043-EVAL \
-#  CYW989820EVB-01 \
-#  CYW920721B2EVK-03 \
+  CYW9M2BASE-43012BT \
+  CYW920819EVB-02 \
+  CYW920820EVB-02 \
+# 20706A2 support can be enabled in future release by adding SUPPORTED_TARGETS
+#  CYW920706WCDEVAL \
 
 TARGET_DEVICE_MAP = \
-  CYW920819EVB-02/20819A1 \
-  CYW920820EVB-02/20820A1 \
+  CYW920721B2EVK-03/20721B2 \
   CYW920721B2EVK-02/20721B2 \
   CYW920719B2Q40EVB-01/20719B2 \
-  CYW920706WCDEVAL/20706A2 \
-# App available on below platforms but not enabled
-#  CYBT-213043-EVAL/20819A1 \
-#  CYW989820EVB-01/20820A1 \
-#  CYW920721B2EVK-03/20721B2 \
-#  CYBT-353027-EVAL/20706A2 \
-#  CYBT-343026-EVAL/20706A2
+  CYW9M2BASE-43012BT/43012C0 \
+  CYW920819EVB-02/20819A1 \
+  CYW920820EVB-02/20820A1 \
+# 20706A2 support can be enabled in future release by adding TARGET_DEVICE_MAP
+#  CYW920706WCDEVAL/20706A2 \
 
 CY_TARGET_DEVICE = $(patsubst $(TARGET)/%,%,$(filter $(TARGET)%,$(TARGET_DEVICE_MAP)))
 
@@ -116,14 +109,20 @@ CY_APP_DEFINES+=-DENABLE_DEBUG=1
 endif
 
 CY_APP_DEFINES+=\
-    -DWICED_BT_TRACE_ENABLE \
-    -DSPP_TRACE_ENABLE
+  -DWICED_BT_TRACE_ENABLE \
+  -DOBEX_LIB_SESSION_SUPPORTED
+
+ifneq ($(filter 43012C0,$(CY_TARGET_DEVICE)),)
+CY_APP_DEFINES += -DWICED_HCI_BAUDRATE=115200
+CY_APP_DEFINES += -DENABLE_MEMORY_PRE_INIT=1
+endif
 
 #
 # Components (middleware libraries)
 #
 COMPONENTS +=bsp_design_modus
-COMPONENTS += spp_lib
+COMPONENTS += map_lib
+COMPONENTS += obex_lib
 
 ifneq ($(filter 20819A1 20820A1,$(CY_TARGET_DEVICE)),)
 CY_APP_PATCH_LIBS += wiced_ble_pre_init_lib.a
@@ -194,6 +193,7 @@ MAKE_OVERRIDES=OTA_FW_UPGRADE=$(OTA_FW_UPGRADE)
 export CONFIG
 export COMPONENTS
 export DISABLE_COMPONENTS
+-include internal.mk
 CY_SHARED_LIB_ARGS:=$(MAKECMDGOALS) $(MAKE_OVERRIDES) CY_APP_DEFINES+="$(CY_APP_DEFINES)" CY_TARGET_DEVICE=$(CY_TARGET_DEVICE) TARGET=$(TARGET)
 
 .PHONY: $(SEARCH_LIBS_AND_INCLUDES) shared_libs
@@ -206,7 +206,6 @@ $(SEARCH_LIBS_AND_INCLUDES):
 CY_APP_LOCATION=$(lastword $(MAKEFILE_LIST))
 
 CY_APP_BUILD_GOALS:=build qbuild clean program qprogram debug qdebug all
--include internal.mk
 ifeq ($(filter setup teardown,$(MAKECMDGOALS)),)
 
 # ensure pre-requisite wiced_btsdk project is present

@@ -36,24 +36,17 @@
  * Runtime Bluetooth stack configuration parameters
  *
  */
-
 #include "wiced_bt_dev.h"
 #include "wiced_bt_ble.h"
-#include "wiced_bt_uuid.h"
 #include "wiced_bt_gatt.h"
 #include "wiced_bt_cfg.h"
 
-/* Null-Terminated Local Device Name */
-uint8_t BT_LOCAL_NAME[] = { 's','p','p',' ','t','e','s','t','\0' };
-const uint16_t BT_LOCAL_NAME_CAPACITY = sizeof(BT_LOCAL_NAME);
-
-
-/*******************************************************************
+/*****************************************************************************
  * wiced_bt core stack configuration
- ******************************************************************/
+ ****************************************************************************/
 const wiced_bt_cfg_settings_t wiced_bt_cfg_settings =
 {
-    .device_name                         = (uint8_t*)BT_LOCAL_NAME,                                         /**< Local device name (NULL terminated) */
+    .device_name                         = (uint8_t*)"MAP Client",                                         /**< Local device name (NULL terminated) */
     .device_class                        = {0x00, 0x00, 0x00},                                         /**< Local device class */
     .security_requirement_mask           = BTM_SEC_IN_AUTHENTICATE | BTM_SEC_OUT_AUTHENTICATE | BTM_SEC_ENCRYPT, /**< Security requirements mask (BTM_SEC_NONE, or combinination of BTM_SEC_IN_AUTHENTICATE, BTM_SEC_OUT_AUTHENTICATE, BTM_SEC_ENCRYPT (see #wiced_bt_sec_level_e)) */
 
@@ -72,24 +65,24 @@ const wiced_bt_cfg_settings_t wiced_bt_cfg_settings =
 
     .ble_scan_cfg =                                                 /* BLE scan settings  */
     {
-        .scan_mode                       = BTM_BLE_SCAN_MODE_ACTIVE,                                  /**< BLE scan mode (BTM_BLE_SCAN_MODE_PASSIVE, BTM_BLE_SCAN_MODE_ACTIVE, or BTM_BLE_SCAN_MODE_NONE) */
+        .scan_mode                       = BTM_BLE_SCAN_MODE_PASSIVE,                                  /**< BLE scan mode (BTM_BLE_SCAN_MODE_PASSIVE, BTM_BLE_SCAN_MODE_ACTIVE, or BTM_BLE_SCAN_MODE_NONE) */
 
         /* Advertisement scan configuration */
-        .high_duty_scan_interval         = 96,                                                         /**< High duty scan interval */
-        .high_duty_scan_window           = 48,                                                         /**< High duty scan window */
-        .high_duty_scan_duration         = 30,                                                         /**< High duty scan duration in seconds (0 for infinite) */
+        .high_duty_scan_interval         = WICED_BT_CFG_DEFAULT_HIGH_DUTY_SCAN_INTERVAL,               /**< High duty scan interval */
+        .high_duty_scan_window           = WICED_BT_CFG_DEFAULT_HIGH_DUTY_SCAN_WINDOW,                 /**< High duty scan window */
+        .high_duty_scan_duration         = 5,                                                          /**< High duty scan duration in seconds (0 for infinite) */
 
-        .low_duty_scan_interval          = 2048,                                                       /**< Low duty scan interval  */
-        .low_duty_scan_window            = 48,                                                         /**< Low duty scan window */
-        .low_duty_scan_duration          = 30,                                                         /**< Low duty scan duration in seconds (0 for infinite) */
+        .low_duty_scan_interval          = WICED_BT_CFG_DEFAULT_LOW_DUTY_SCAN_INTERVAL,                /**< Low duty scan interval  */
+        .low_duty_scan_window            = WICED_BT_CFG_DEFAULT_LOW_DUTY_SCAN_WINDOW,                  /**< Low duty scan window */
+        .low_duty_scan_duration          = 5,                                                          /**< Low duty scan duration in seconds (0 for infinite) */
 
         /* Connection scan configuration */
-        .high_duty_conn_scan_interval    = 96,                                                         /**< High duty cycle connection scan interval */
-        .high_duty_conn_scan_window      = 48,                                                         /**< High duty cycle connection scan window */
+        .high_duty_conn_scan_interval    = WICED_BT_CFG_DEFAULT_HIGH_DUTY_CONN_SCAN_INTERVAL,          /**< High duty cycle connection scan interval */
+        .high_duty_conn_scan_window      = WICED_BT_CFG_DEFAULT_HIGH_DUTY_CONN_SCAN_WINDOW,            /**< High duty cycle connection scan window */
         .high_duty_conn_duration         = 30,                                                         /**< High duty cycle connection duration in seconds (0 for infinite) */
 
-        .low_duty_conn_scan_interval     = 2048,                                                       /**< Low duty cycle connection scan interval */
-        .low_duty_conn_scan_window       = 48,                                                         /**< Low duty cycle connection scan window */
+        .low_duty_conn_scan_interval     = WICED_BT_CFG_DEFAULT_LOW_DUTY_CONN_SCAN_INTERVAL,           /**< Low duty cycle connection scan interval */
+        .low_duty_conn_scan_window       = WICED_BT_CFG_DEFAULT_LOW_DUTY_CONN_SCAN_WINDOW,             /**< Low duty cycle connection scan window */
         .low_duty_conn_duration          = 30,                                                         /**< Low duty cycle connection duration in seconds (0 for infinite) */
 
         /* Connection configuration */
@@ -109,8 +102,8 @@ const wiced_bt_cfg_settings_t wiced_bt_cfg_settings =
         .high_duty_max_interval          = WICED_BT_CFG_DEFAULT_HIGH_DUTY_ADV_MAX_INTERVAL,            /**< High duty undirected connectable maximum advertising interval */
         .high_duty_duration              = 30,                                                         /**< High duty undirected connectable advertising duration in seconds (0 for infinite) */
 
-        .low_duty_min_interval           = WICED_BT_CFG_DEFAULT_LOW_DUTY_ADV_MIN_INTERVAL,                                                       /**< Low duty undirected connectable minimum advertising interval */
-        .low_duty_max_interval           = WICED_BT_CFG_DEFAULT_LOW_DUTY_ADV_MAX_INTERVAL,                                                       /**< Low duty undirected connectable maximum advertising interval */
+        .low_duty_min_interval           = 1024,                                                       /**< Low duty undirected connectable minimum advertising interval */
+        .low_duty_max_interval           = 1024,                                                       /**< Low duty undirected connectable maximum advertising interval */
         .low_duty_duration               = 60,                                                         /**< Low duty undirected connectable advertising duration in seconds (0 for infinite) */
         .high_duty_directed_min_interval = WICED_BT_CFG_DEFAULT_HIGH_DUTY_DIRECTED_ADV_MIN_INTERVAL,   /**< High duty directed connectable minimum advertising interval */
         .high_duty_directed_max_interval = WICED_BT_CFG_DEFAULT_HIGH_DUTY_DIRECTED_ADV_MAX_INTERVAL,   /**< High duty directed connectable maximum advertising interval */
@@ -130,7 +123,7 @@ const wiced_bt_cfg_settings_t wiced_bt_cfg_settings =
 
     .gatt_cfg =                                                     /* GATT configuration */
     {
-        .appearance                     = APPEARANCE_GENERIC_COMPUTER,                                      /**< GATT appearance (see gatt_appearance_e) */
+        .appearance                     = APPEARANCE_GENERIC_TAG,                                      /**< GATT appearance (see gatt_appearance_e) */
         .client_max_links               = 3,                                                           /**< Client config: maximum number of servers that local client can connect to  */
         .server_max_links               = 1,                                                           /**< Server config: maximum number of remote clients connections allowed by the local */
         .max_attr_len                   = 512,                                                         /**< Maximum attribute length; gki_cfg must have a corresponding buffer pool that can hold this length */
@@ -141,17 +134,17 @@ const wiced_bt_cfg_settings_t wiced_bt_cfg_settings =
 
     .rfcomm_cfg =                                                   /* RFCOMM configuration */
     {
-        .max_links                      = 2,                                                           /**< Maximum number of simultaneous connected remote devices*/
-        .max_ports                      = 2                                                            /**< Maximum number of simultaneous RFCOMM ports */
+        .max_links                      = 7,                                                           /**< Maximum number of simultaneous connected remote devices*/
+        .max_ports                      = 7                                                            /**< Maximum number of simultaneous RFCOMM ports */
     },
 
     .l2cap_application =                                            /* Application managed l2cap protocol configuration */
     {
-        .max_links                      = 0,                                                           /**< Maximum number of application-managed l2cap links (BR/EDR and LE) */
+        .max_links                      = 2,                                                           /**< Maximum number of application-managed l2cap links (BR/EDR and LE) */
 
         /* BR EDR l2cap configuration */
-        .max_psm                        = 0,                                                           /**< Maximum number of application-managed BR/EDR PSMs */
-        .max_channels                   = 0,                                                           /**< Maximum number of application-managed BR/EDR channels  */
+        .max_psm                        = 7,                                                           /**< Maximum number of application-managed BR/EDR PSMs */
+        .max_channels                   = 7,                                                           /**< Maximum number of application-managed BR/EDR channels  */
 
         /* LE L2cap connection-oriented channels configuration */
         .max_le_psm                     = 0,                                                           /**< Maximum number of application-managed LE PSMs */
@@ -194,25 +187,23 @@ const wiced_bt_cfg_settings_t wiced_bt_cfg_settings =
 #endif
 
 #if defined(CYW20719B2) || defined(CYW20721B2) || defined(CYW20819A1) || defined (CYW20820A1)
-    .default_ble_power_level            = 0                                                            /**< Default LE power level, Refer lm_TxPwrTable table for the power range */
+    .default_ble_power_level            = 12                                                           /**< Default LE power level, Refer lm_TxPwrTable table for the power range */
 #endif
 };
 
-/*******************************************************************
+/*****************************************************************************
  * wiced_bt_stack buffer pool configuration
  *
  * Configure buffer pools used by the stack
  *
  * Pools must be ordered in increasing buf_size.
- * If a pools runs out of buffers, the next pool will be used.
- ******************************************************************/
-
+ * If a pool runs out of buffers, the next  pool will be used
+ *****************************************************************************/
 const wiced_bt_cfg_buf_pool_t wiced_bt_cfg_buf_pools[WICED_BT_CFG_NUM_BUF_POOLS] =
 {
-/*  { buf_size, buf_count, }, */
-    { 64,       16,        }, /* Small Buffer Pool */
-    { 360,      40,         }, /* Medium Buffer Pool (used for HCI & RFCOMM control messages, min recommended size is 360) */
-    { 1056,     6,         }, /* Large Buffer Pool  (used for HCI ACL messages) */
-    { 1056,     1,         }, /* Extra Large Buffer Pool (used for SDP Discovery) */
-
+/*  { buf_size, buf_count } */
+    { 64,       16  },      /* Small Buffer Pool */
+    { 360,      8   },      /* Medium Buffer Pool (used for HCI & RFCOMM control messages, min recommended size is 360) */
+    { 1056,     4   },      /* Large Buffer Pool  (used for HCI ACL messages) */
+    { 2048,     2   },      /* Extra Large Buffer Pool - Used for avdt media packets and miscellaneous (if not needed, set buf_count to 0) */
 };
